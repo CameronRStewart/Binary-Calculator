@@ -59,30 +59,13 @@ var calc = function() {
   operands = normalizeOperandLength(operands);
   indexLength = operands[0].length;
 
-  var sum = 0;
   var op_res = [];
   var result = [];
 
   if(add){
-    var carry = 0;
-    for (var i = (indexLength - 1); i >= 0; i--) {
-      op_res = binaryAdd(operands[0][i], operands[1][i], carry);
-      sum = op_res[0];
-      carry = op_res[1];
-      result.unshift(sum);
-    }
-    if (carry == 1) { result.unshift(carry);}
-
+    var result = iterateOperation(operands, 'a');
   } else if (subtract) {
-    var borrow = 0;
-    for (var i = (indexLength - 1); i >= 0; i--) {
-      op_res = binarySub(operands[0][i], operands[1][i], borrow);
-      difference = op_res[0];
-      borrow = op_res[1];
-      result.unshift(difference);
-    }
-
-
+    var result = iterateOperation(operands, 's');
   } else if (multiply) {
 
   } else if (divide) {
@@ -111,6 +94,31 @@ var normalizeOperandLength = function(operands) {
     operands[0] = zeroPad(operands[0], (len1 - len0));
   }
   return operands;
+}
+
+var iterateOperation = function(operands, mode) {
+  operands = normalizeOperandLength(operands);
+  indexLength = operands[0].length;
+
+  var op_res = [];
+  var result = [];
+
+  var carry_or_borrow = 0;
+  for (var i = (indexLength - 1); i >= 0; i--) {
+    if(mode == 'a') {
+      op_res = binaryAdd(operands[0][i], operands[1][i], carry_or_borrow);
+    } else if (mode == 's') {
+      op_res = binarySub(operands[0][i], operands[1][i], carry_or_borrow)
+    }
+
+    sum_or_diff = op_res[0];
+    carry_or_borrow = op_res[1];
+    result.unshift(sum_or_diff);
+  }
+  // This should only apply to addition - needs refactor.
+  if (carry_or_borrow == 1) { result.unshift(carry_or_borrow);}
+
+  return result;
 }
 
 var binaryAdd = function(n1,n2,carry) {
