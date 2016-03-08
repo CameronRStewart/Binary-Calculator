@@ -121,6 +121,39 @@ var iterateOperation = function(operands, mode) {
   return result;
 }
 
+var iterateMultiplication(operands) {
+  op_i = operands[0];
+  op_j = operands[1];
+  len0 = op_i.length;
+  len1 = op_j.length;
+  results_to_add = [];
+
+  /**
+  *   0110 - i
+  *    011 - j
+  *   ----
+  *   0110
+  *  01100
+  * 000000
+  *=010010
+  **/
+
+  for(var j = 0; j < len1; j++) {
+    results_to_add[j] = [];
+    // pad results_to_add[j] with j zeros to facilitate multiplication.
+    results_to_add[j] = zeroPad(results_to_add[j], j);
+    for(var i = 0; i < len0; i++) {
+      results_to_add[j].unshift(op_i[(len0 - i)] * op_j[(len1 - j)]);
+    }
+  }
+  // Now add each result in the results_to_add array
+  rta_len = results_to_add.length;
+  tmp = results_to_add[0];
+  for(var k = 1; k < rta_len; k++) {
+    tmp = iterateOperation(tmp, results_to_add[k], 'a');
+  }
+}
+
 var binaryAdd = function(n1,n2,carry) {
   ret = [];
   if (carry == 1) {
