@@ -67,7 +67,7 @@ var calc = function() {
   } else if (subtract) {
     var result = iterateOperation(operands, 's');
   } else if (multiply) {
-
+    var result = iterateMultiplication(operands);
   } else if (divide) {
 
   } else {
@@ -83,6 +83,11 @@ var clear = function() {
   resultDisplay.innerHTML = "";
 }
 
+/**
+* Mostly for addition and subtraction, this
+* function finds the shorter operand and pads
+* it with zeros to make the operands equal length.
+**/
 var normalizeOperandLength = function(operands) {
   var len0 = operands[0].length;
   var len1 = operands[1].length;
@@ -108,7 +113,7 @@ var iterateOperation = function(operands, mode) {
     if(mode == 'a') {
       op_res = binaryAdd(operands[0][i], operands[1][i], carry_or_borrow);
     } else if (mode == 's') {
-      op_res = binarySub(operands[0][i], operands[1][i], carry_or_borrow)
+      op_res = binarySub(operands[0][i], operands[1][i], carry_or_borrow);
     }
 
     sum_or_diff = op_res[0];
@@ -121,7 +126,7 @@ var iterateOperation = function(operands, mode) {
   return result;
 }
 
-var iterateMultiplication(operands) {
+var iterateMultiplication = function(operands) {
   op_i = operands[0];
   op_j = operands[1];
   len0 = op_i.length;
@@ -143,15 +148,21 @@ var iterateMultiplication(operands) {
     // pad results_to_add[j] with j zeros to facilitate multiplication.
     results_to_add[j] = zeroPad(results_to_add[j], j);
     for(var i = 0; i < len0; i++) {
-      results_to_add[j].unshift(op_i[(len0 - i)] * op_j[(len1 - j)]);
+      results_to_add[j].unshift((op_i[(len0 - i)] * op_j[(len1 - j)]));
     }
   }
   // Now add each result in the results_to_add array
   rta_len = results_to_add.length;
   tmp = results_to_add[0];
+  var tmp_operands = []
   for(var k = 1; k < rta_len; k++) {
-    tmp = iterateOperation(tmp, results_to_add[k], 'a');
+    // This is really ugly because Ive trapped myself into
+    // requiring an operand array everywhere instead of
+    // separate operands.
+    tmp_operands = [tmp, results_to_add[k]];
+    tmp = iterateOperation(tmp_operands, 'a');
   }
+  return tmp;
 }
 
 var binaryAdd = function(n1,n2,carry) {
