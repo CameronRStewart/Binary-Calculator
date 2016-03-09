@@ -133,22 +133,12 @@ var iterateMultiplication = function(operands) {
   len1 = op_j.length;
   results_to_add = [];
 
-  /**
-  *   0110 - i
-  *    011 - j
-  *   ----
-  *   0110
-  *  01100
-  * 000000
-  *=010010
-  **/
-
   for(var j = 0; j < len1; j++) {
     results_to_add[j] = [];
     // pad results_to_add[j] with j zeros to facilitate multiplication.
     results_to_add[j] = zeroPad(results_to_add[j], j);
     for(var i = 0; i < len0; i++) {
-      results_to_add[j].unshift((op_i[(len0 - i)] * op_j[(len1 - j)]));
+      results_to_add[j].unshift((op_i[((len0-1) - i)] * op_j[((len1-1) - j)]));
     }
   }
   // Now add each result in the results_to_add array
@@ -214,11 +204,11 @@ var binarySub = function(n1, n2, borrow) {
 }
 
 var zeroPad = function(arr, n) {
-  var zeros = "";
+  var ret = arr;
   for (var i = 0; i < n; i++) {
-    zeros += '0';
+    ret.unshift('0');
   }
-  return zeros + arr;
+  return ret;
 }
 document.onkeypress = handleKeydown;
 document.getElementById('btn0').onclick = putDisp;
